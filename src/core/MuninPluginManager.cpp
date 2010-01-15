@@ -31,6 +31,7 @@
 #include "../plugins/speedfan/SpeedFanNodePlugin.h"
 #include "../plugins/PerfCounterMuninNodePlugin.h"
 #include "../plugins/external/ExternalMuninNodePlugin.h"
+#include "../plugins/external/NewExternalMuninNodePlugin.h"
 
 #ifdef _DEBUG
 class MuninPluginManagerTestThread : public JCThread {
@@ -96,6 +97,23 @@ MuninPluginManager::MuninPluginManager()
     }
   }
 
+  if (g_Config.GetValueB("Plugins", "NewExternal", true)) {
+	  const char *extPrefix = NewExternalMuninNodePlugin::SectionPrefix;
+	  size_t extPrefixLen = strlen(extPrefix);
+	  for (size_t i = 0; i < g_Config.GetNumKeys(); i++) {
+		std::string keyName = g_Config.GetKeyName(i);
+		if (keyName.compare(0, extPrefixLen, extPrefix) == 0) {
+			NewExternalMuninNodePlugin *plugin = new NewExternalMuninNodePlugin(keyName);
+			if (plugin->IsLoaded()) {
+				AddPlugin(plugin);
+			} else {
+				_Module.LogError("Failed to load NewExternal plugin: [%s]", keyName.c_str());
+				delete plugin;
+			}
+		}
+	  }
+  }
+
   const char *perfPrefix = PerfCounterMuninNodePlugin::SectionPrefix;
   size_t perfPrefixLen = strlen(perfPrefix);
   for (size_t i = 0; i < g_Config.GetNumKeys(); i++) {
@@ -105,7 +123,7 @@ MuninPluginManager::MuninPluginManager()
       if (plugin->IsLoaded()) {
         AddPlugin(plugin);
       } else {
-        _Module.LogEvent("Failed to load PerfCounter plugin: [%s]", keyName.c_str());
+        _Module.LogError("Failed to load PerfCounter plugin: [%s]", keyName.c_str());
         delete plugin;
       }
     }
