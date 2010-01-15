@@ -22,7 +22,7 @@
 #include "../../core/Service.h"
 
 
-void removeAllNL (std::string &str)
+void ExternalMuninNodePlugin::removeAllNL (std::string &str)
 {
     std::string temp;
     for (unsigned int i = 0; i < str.length(); i++)
@@ -30,7 +30,7 @@ void removeAllNL (std::string &str)
     str = temp;
 }
 
-void removeAllLF (std::string &str)
+void ExternalMuninNodePlugin::removeAllLF (std::string &str)
 {
     std::string temp;
     for (unsigned int i = 0; i < str.length(); i++)
@@ -85,7 +85,7 @@ std::string ExternalMuninNodePlugin::Run(const char *command)
   _snprintf(cmdLine, MAX_PATH, "\"%s\" %s", m_ExternalPlugin.c_str(), command);
 
   PluginPipe pipe;
-  if (pipe.Execute(A2TConvert(cmdLine).c_str()) == CPEXEC_OK) {
+  if (pipe.Execute(A2TConvert(cmdLine).c_str(), NULL) == CPEXEC_OK) {
     // Wait for the command to complete
     while (pipe.IsChildRunning())
       Sleep(100); // don't do a very tight loop -- that reduces CPU usage

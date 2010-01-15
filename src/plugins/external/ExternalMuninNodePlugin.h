@@ -14,6 +14,8 @@ public:
   virtual bool IsThreadSafe() { return true; };
 
 private:  
+	void removeAllNL (std::string &str);
+	void removeAllLF (std::string &str);
   class PluginPipe : public CConsolePipe {
   public:
     PluginPipe();

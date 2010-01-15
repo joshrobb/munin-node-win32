@@ -82,7 +82,7 @@ BOOL CConsolePipe::IsConsoleAttached() {
 }
 
 // execute a command with a DOS command processor; see CPEXEC_xxx for return values
-int CConsolePipe::Execute(LPCTSTR pszCommand) {
+int CConsolePipe::Execute(LPCTSTR pszCommand, LPVOID lpEnv) {
 	assert(pszCommand && *pszCommand);
 
 	// for (running) reusable command processors, send this as another input
@@ -179,7 +179,7 @@ int CConsolePipe::Execute(LPCTSTR pszCommand) {
 		CloseHandle(loadzaHandles[0]);  loadzaHandles[0] = INVALID_HANDLE_VALUE;
 		CloseHandle(loadzaHandles[2]);  loadzaHandles[2] = INVALID_HANDLE_VALUE;
 
-		if(LaunchRedirected(pszCommand, loadzaHandles[1], loadzaHandles[3], loadzaHandles[4]))
+		if(LaunchRedirected(pszCommand, loadzaHandles[1], loadzaHandles[3], loadzaHandles[4], lpEnv))
 		{
 			// Close pipe handles (do not continue to modify the parent).
 			// You need to make sure that no handles to the write end of the
@@ -321,7 +321,7 @@ void CConsolePipe::StopCmd() {
 
 		if( (CPF_REUSECMDPROC & m_dwFlags) ) {
 			//SendChildInput(^Z) would help stop some blocked processors
-			Execute(_T("exit"));
+			Execute(_T("exit"), NULL);
 			Sleep(200);
 			// cleanup will occur "naturally"
 		}
@@ -428,7 +428,7 @@ BOOL CConsolePipe::SetupConsole() {
 }
 
 BOOL CConsolePipe::LaunchRedirected(LPCTSTR pszCommand, HANDLE hChildStdOut, HANDLE hChildStdIn, 
-	HANDLE hChildStdErr)
+	HANDLE hChildStdErr, LPVOID lpEnv)
 {
 	assert(hChildStdOut != INVALID_HANDLE_VALUE && 
 		hChildStdIn != INVALID_HANDLE_VALUE &&
@@ -503,7 +503,7 @@ BOOL CConsolePipe::LaunchRedirected(LPCTSTR pszCommand, HANDLE hChildStdOut, HAN
 		*/
 
 	BOOL ok = CreateProcess(NULL, strExec, NULL, NULL, TRUE, // handles inherited
-		dwCreateFlags, NULL, NULL, &si, &pi);
+		dwCreateFlags, lpEnv, NULL, &si, &pi);
 
 	if(ok) {
 		// Close any unnecessary handles.

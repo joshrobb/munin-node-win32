@@ -69,7 +69,7 @@ public:
 	static BOOL IsConsoleAttached();
 
 	/// execute a command with a DOS command processor; see CPEXEC_xxx for return values
-	int Execute(LPCTSTR pszCommand);
+	int Execute(LPCTSTR pszCommand, LPVOID lpEnv);
 
 	/// override this for doing other things with the output
 	virtual void OnReceivedOutput(LPCTSTR pszText) = 0;
@@ -93,7 +93,7 @@ public:
 private: // internal implementation
 	BOOL SetupConsole();
 	BOOL LaunchRedirected(LPCTSTR pszCommand, HANDLE hChildStdOut, HANDLE hChildStdIn, 
-		HANDLE hChildStdErr);
+		HANDLE hChildStdErr, LPVOID lpEnv);
 	// listen for output and pass it to the parent object
 	static DWORD WINAPI ListenerThreadProc(LPVOID lpParameter);
 
