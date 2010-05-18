@@ -18,6 +18,8 @@ public:
 private:  
   bool OpenPlugin();
   void removeAllLF (std::string &str);
+  void setEnv();
+  void clearEnv();
 
   class PluginPipe : public CConsolePipe {
   public:
@@ -33,7 +35,10 @@ private:
   std::string Run(const char *command);
 
   bool m_Loaded;
-  std::vector<std::string> m_envArray;
+  std::vector<std::string> m_envNames;
+  std::vector<std::string> m_envValues;
   std::string m_Command;
   std::string m_SectionName;
 };
+
+extern JCCritSec g_ExternalEnvironmentCritSec;

@@ -83,24 +83,22 @@ MuninPluginManager::MuninPluginManager()
     AddPlugin(new SpeedFanNodePlugin());
   
   if (g_Config.GetValueB("Plugins", "External", true)) {
-    int externalCount = g_Config.NumValues("ExternalPlugin");
-    for (int i = 0; i < externalCount; i++) {
-      std::string valueName = g_Config.GetValueName("ExternalPlugin", i); 
-      std::string filename = g_Config.GetValue("ExternalPlugin", valueName);
-      ExternalMuninNodePlugin *plugin = new ExternalMuninNodePlugin(filename);
-      if (plugin->IsLoaded()) {
-        AddPlugin(plugin);
-      } else {
-        _Module.LogError("Failed to load External plugin: %s", filename.c_str());
-        delete plugin;
-      }
-    }
-  }
+	int externalCount = g_Config.NumValues("ExternalPlugin");
+	for (int i = 0; i < externalCount; i++) {
+	  std::string valueName = g_Config.GetValueName("ExternalPlugin", i); 
+	  std::string filename = g_Config.GetValue("ExternalPlugin", valueName);
+	  ExternalMuninNodePlugin *plugin = new ExternalMuninNodePlugin(filename);
+	  if (plugin->IsLoaded()) {
+		AddPlugin(plugin);
+	  } else {
+		_Module.LogError("Failed to load External plugin: %s", filename.c_str());
+		delete plugin;
+	  }
+	}
 
-  if (g_Config.GetValueB("Plugins", "NewExternal", true)) {
-	  const char *extPrefix = NewExternalMuninNodePlugin::SectionPrefix;
-	  size_t extPrefixLen = strlen(extPrefix);
-	  for (size_t i = 0; i < g_Config.GetNumKeys(); i++) {
+	const char *extPrefix = NewExternalMuninNodePlugin::SectionPrefix;
+	size_t extPrefixLen = strlen(extPrefix);
+	for (size_t i = 0; i < g_Config.GetNumKeys(); i++) {
 		std::string keyName = g_Config.GetKeyName(i);
 		if (keyName.compare(0, extPrefixLen, extPrefix) == 0) {
 			NewExternalMuninNodePlugin *plugin = new NewExternalMuninNodePlugin(keyName);
@@ -111,7 +109,7 @@ MuninPluginManager::MuninPluginManager()
 				delete plugin;
 			}
 		}
-	  }
+	}
   }
 
   const char *perfPrefix = PerfCounterMuninNodePlugin::SectionPrefix;
