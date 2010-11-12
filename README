@@ -1,0 +1,12 @@
+munin-node - agent for windows. 
+
+Yet another fork of the origional munin-node-win32 agent. Munin Node for Windows is a Windows client for the Munin monitoring system.It is written in C++ with most plugins built into the executable.
+
+The lineage is like this. 
+
+http://sourceforge.net/projects/munin-nodewin32/ -> http://code.google.com/p/munin-node-win32/ -> http://github.com/joshrobb/munin-node-win32
+
+I've chosen to put this on github - because at least forking is easy here - and pull requests are even easier. 
+
+The new feature here is the ability to support DERIVE types for perfmon counters.
+
