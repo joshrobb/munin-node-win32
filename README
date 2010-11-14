@@ -8,5 +8,8 @@ http://sourceforge.net/projects/munin-nodewin32/ -> http://code.google.com/p/mun
 
 I've chosen to put this on github - because at least forking is easy here - and pull requests are even easier. 
 
-The new feature here is the ability to support DERIVE types for perfmon counters.
+New Features
+* support DERIVE types for perfmon counters.
+* turn of verbose event log logging (controled via [MuninNode] DebugLog=true/false)  
+
 
