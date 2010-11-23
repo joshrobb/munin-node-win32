@@ -163,7 +163,7 @@ void CService::Run()
   else
   {
     // Let the server go for a few seconds
-    Sleep(10 * 1000);
+    Sleep(60 * 1000);
   }
 
   LogEvent("Stopping Server Thread");
