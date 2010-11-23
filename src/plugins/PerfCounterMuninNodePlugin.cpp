@@ -217,9 +217,8 @@ int PerfCounterMuninNodePlugin::GetConfig(char *buffer, int len)
 
 	if(counterType == "DERIVE") {
 		minValue = "%s.min 0\n";
-		minValueNumbered = "%s_%i_.min 0\n";
 	} else {
-		minValue = minValueNumbered = "";
+		minValue = "";
 	}
 
     assert(m_CounterNames.size() == m_Counters.size());
@@ -228,55 +227,38 @@ int PerfCounterMuninNodePlugin::GetConfig(char *buffer, int len)
 
       // We handle multiple counters
       for (size_t i = 0; i < m_CounterNames.size(); i++) {
-        if (i == 0) {
 
-		  labels = "%s.label %s\n"
-				   "%s.draw %s\n"
-				   "%s.type %s\n";
-		  labels += minValue;
+	    labels = "%s.label %s\n"
+			     "%s.draw %s\n"
+	  		     "%s.type %s\n";
+	    labels += minValue;
 
-          // First counter gets a normal name
-          printCount = _snprintf(buffer, len, 
-			labels.c_str(),
-            m_Name.c_str(), m_CounterNames[i].c_str(),
-            m_Name.c_str(), graphDraw.c_str(),
-			m_Name.c_str(), counterType.c_str(),
-			m_Name.c_str());
-        } else {
-          // Rest of the counters are numbered
+		std::string countername = m_CounterNames[i] + '\0';
 
-		  labels = "%s_%i_.label %s\n"
- 				   "%s_%i_.draw %s\n"
-				   "%s_%i_.type %s\n";
-		  labels += minValueNumbered;
+		char *nameStr = (char *)countername.c_str();
+		while (*nameStr != 0) {
+			if (!isalnum(*nameStr))
+					*nameStr = '_';
+			nameStr++;
+		}
 
-          printCount = _snprintf(buffer, len, 
-            labels.c_str(),
-            m_Name.c_str(), i, m_CounterNames[i].c_str(),
-            m_Name.c_str(), i, graphDraw.c_str(),
-			m_Name.c_str(), i, counterType.c_str(),
-			m_Name.c_str(), i);
-        }
-        len -= printCount;
+		countername = m_Name + '_' + countername;
+
+        // First counter gets a normal name
+        printCount = _snprintf(buffer, len, 
+		labels.c_str(),
+        countername.c_str(), m_CounterNames[i].c_str(),
+        countername.c_str(), graphDraw.c_str(),
+		countername.c_str(), counterType.c_str(),
+		countername.c_str());
+
+    	len -= printCount;
         buffer += printCount;
       }
     }
 
   strncat(buffer, ".\n", len);
   return 0;
-}
-
-int printvalue(char* buffer, size_t len, const char* name, size_t i, double value, DWORD counterformat) {
-	if(counterformat == PDH_FMT_LONG)
-		if(0==i)
-			return _snprintf(buffer, len, "%s.value %i\n", name, (int)value);
-		else
-			return _snprintf(buffer, len, "%s_%i_.value %i\n", name, i, (int)value);
-	else 
-		if(0==i)
-			return _snprintf(buffer, len, "%s.value %.2f\n", name, value);
-		else
-			return _snprintf(buffer, len, "%s_%i_.value %.2f\n", name, i, value);
 }
 
 int PerfCounterMuninNodePlugin::GetValues(char *buffer, int len)
@@ -306,7 +288,26 @@ int PerfCounterMuninNodePlugin::GetValues(char *buffer, int len)
         value = counterValue.largeValue * m_CounterMultiply;
         break;
     }
-    printCount = printvalue(buffer, len, m_Name.c_str(), i, value, m_dwCounterFormat);
+
+	std::string countername = m_CounterNames[i];
+	countername += '\0';
+
+	char *nameStr = (char *)countername.c_str();
+	while (*nameStr != 0) {
+		if (!isalnum(*nameStr))
+				*nameStr = '_';
+		nameStr++;
+	}
+
+	countername = m_Name + '_' + countername;
+
+	if(m_dwCounterFormat == PDH_FMT_LONG)
+		printCount = _snprintf(buffer, len, "%s.value %i\n", countername.c_str(), (int)value);
+	else 
+		printCount = _snprintf(buffer, len, "%s.value %.2f\n", countername.c_str(), value);
+
+
+    //printCount = printvalue(buffer, len, countername.c_str(), i, value, m_dwCounterFormat);
     len -= printCount;
     buffer += printCount;
   }
